@@ -1,4 +1,4 @@
-name: Deploy dynamodb reources in all environment
+name: Dynamodb
 on:
   push:
     paths:

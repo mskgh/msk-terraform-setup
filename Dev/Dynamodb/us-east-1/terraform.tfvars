@@ -9,5 +9,6 @@ msk-dynamodb-table = {
 }
 
 tags = {
-  Name = "MSK Users Table"
+  Name        = "MSK Users Table"
+  Environment = "Development"
 }

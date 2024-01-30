@@ -1,4 +1,4 @@
-name: Deploy s3 reources in all environment
+name: s3 Bucket
 on:
   push:
     branches:
