@@ -1,0 +1,147 @@
+name: Dynamodb
+description: ""
+
+#env:
+  
+  # # Terragrunt Env Variables
+  # tf_version: 'latest'
+  # tg_version: 'latest'
+  # tf_east_us_1_working_dir: '.'
+  # tf_east_us_2_working_dir: '.'
+
+  # # Main Environment Variables
+  # dynamodbTable: "kpXUwRVx1s4HMkJ5vPi8-test-table"
+  # s3Bucket: "terraform-state-file-10num"
+  # regionName: "us-east-1"
+  # toEncrypt: true
+
+inputs:
+  tf_version:
+    description: ts required
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+
+      - name: 's3, dynamodb terraform config'
+        run: ./setup.sh deploy
+
+      # Deploy on east-us-1 region
+
+      - name: 'Terragrunt Init'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ env.tf_version }}
+          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: ${{ env.tf_east_us_1_working_dir }}
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Terragrunt Plan'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ env.tf_version }}
+          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_subcommand: 'plan'
+          tf_actions_working_dir: ${{ env.tf_east_us_1_working_dir }}
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      # Deploy on east-us-2 region
+      
+      - name: 'Terragrunt Format'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ env.tf_version }}
+          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_binary: 'terraform'
+          tf_actions_subcommand: 'fmt'
+          tf_actions_working_dir: ${{ env.tf_east_us_2_working_dir }}
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Terragrunt Init'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ env.tf_version }}
+          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: ${{ env.tf_east_us_2_working_dir }}
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Terragrunt Validate'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ env.tf_version }}
+          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_binary: 'terraform'
+          tf_actions_subcommand: 'validate'
+          tf_actions_working_dir: ${{ env.tf_east_us_2_working_dir }}
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Terragrunt Plan'
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_version: ${{ env.tf_version }}
+          tg_actions_version: ${{ env.tg_version }}
+          tf_actions_subcommand: 'plan'
+          tf_actions_working_dir: ${{ env.tf_east_us_2_working_dir }}
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  Stage:
+    if: github.ref == 'refs/heads/stage'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Stage/Dynamodb
+    steps:
+      - id: CheckOut
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+  UAT:
+    if: github.ref == 'refs/heads/uat'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Uat/Dynamodb
+    steps:
+      - id: CheckOut
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+  Perf:
+    if: github.ref == 'refs/heads/perf'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Perf/Dynamodb
+    steps:
+      - id: CheckOut
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+  Main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Main/Dynamodb
+    steps:
+      - id: CheckOut
+        name: Checkout Repository
+        uses: actions/checkout@v4

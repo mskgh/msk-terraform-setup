@@ -1,16 +1,16 @@
-
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite_terragrunt"
   contents = <<EOF
   terraform {
     backend "s3" {
-        bucket         = "terraform-state-file-10num"
+        bucket         = "${get_env("s3Bucket")}"
         key            = "${path_relative_to_include()}/terraform.tfstate"
-        region         = "us-east-1"
-        encrypt        = true
-        dynamodb_table = "kpXUwRVx1s4HMkJ5vPi8-test-table"
+        region         = "${get_env("regionName")}"
+        encrypt        = "${get_env("toEncrypt")}"
+        dynamodb_table = "${get_env("dynamodbTable")}"
     }
   }
 EOF
 }
+

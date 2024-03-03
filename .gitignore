@@ -1,2 +1,2 @@
-*/*/*/.terraform.lock.hcl
-*/*/*/.terragrunt-cache
+*/*/*/*/*/*/.terragrunt-cache
+*/*/*/*/*/*/.terraform.lock.hcl
